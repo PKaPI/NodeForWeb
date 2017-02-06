@@ -1,0 +1,9 @@
+target/
+.idea/
+logs/
+*.iml
+run.jar
+run.jar.original
+/configCodeBuilder/src/main/resources/metadata/*data.xml
+node_modules/
+.project
