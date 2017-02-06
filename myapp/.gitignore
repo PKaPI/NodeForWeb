@@ -1,0 +1,12 @@
+target/
+.idea/
+logs/
+*.iml
+run.jar
+run.jar.original
+/configCodeBuilder/src/main/resources/metadata/*data.xml
+views/
+public/
+node_modules/
+fe_static/html/.project
+.project
