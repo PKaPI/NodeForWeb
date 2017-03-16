@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 var request =require('request');
-var http = require('http')  
-var Promise = require('promise')  
-var cheerio = require('cheerio')  
+var http = require('http');  
+var Promise = require('promise');  
+var cheerio = require('cheerio');
+var fs=require('fs'); 
       
 var baseUrl = 'http://www.imooc.com/learn/'  
 var url = 'http://www.imooc.com/learn/348'  
@@ -71,7 +72,7 @@ var vedioIds = ['348','637','259','75','197']
     }  
       
     function getPageAsync(url) {  
-        return new Promise(function(resolve, reject) {  
+        return new Promise(function(resolve, reject) {   //如果成功resolve 失败reject 二者都是返回一个Promise对象
             console.log('正在爬取 ' + url)  
       
             // 拿到源码，调用方法进行解析及输出  
@@ -93,28 +94,55 @@ var vedioIds = ['348','637','259','75','197']
             })  
         })  
     }  
-      
+    function setFile(file){
+         return new Promise(function(resolve, reject) {
+             console.log('正在存储')
+             fs.appendFile('../datas/data.txt', file, 'utf-8', function (err) {
+                if (err) {
+                    reject(err);
+                    console.log('存储数据失败');
+                }else{
+                    resolve(file);
+                }
+            });
+         })
+    } 
     var fetchCourseArray = []  
       
     vedioIds.forEach(function(id) {  
         fetchCourseArray.push(getPageAsync(baseUrl + id))  
     })  
-      
+   
     Promise  
         .all(fetchCourseArray)  
-        .then(function(pages) {  
-            var coursesData = []  
-      
+        .then(function(pages) {
+            //do something with three data form our actors  
+            var coursesData = [];
+            var files=[];  
             pages.forEach(function(html) {  
-                var course = filterChapters(html)  
-      
-                coursesData.push(course)  
+                // var course = filterChapters(html);  
+                // coursesData.push(course);
+                files.push(setFile(html));
             })  
       
             // coursesData.sort(function(a, b) {  
             //     return a.number < b.number  
             // })  
       
-            printCoursesData(coursesData)  
-        })   
+            // printCoursesData(coursesData);
+            Promises(files); 
+        })
+        .catch(function(err){
+            console.log(err);
+        });
+       function Promises(files){  //存文件
+            Promise  
+            .all(files)  
+            .then(function(item) {
+            })
+            .catch(function(err){
+                console.log(err);
+            })
+       }
+             
 module.exports = router;

@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session=require('express-session');//使用session
 
-var creeper = require('./routes/creeper');
+var creeper = require('./routes/creeper2');
 var users = require('./routes/admin/login');
 
 var app = express();

@@ -1,49 +1,51 @@
 var express = require('express');
 var router = express.Router();
 var cheerio = require('cheerio');
-var request =require('request');
+var request = require('request');
 var http=require('http');
 var url = 'http://www.imooc.com/learn/348'
 /* GET home page. */
 router.get('/', function(req, res, next) {
+    // console.log(111)
   res.render('index', { title: '222' });
 });
-// router.get('/load', function(req, res, next) {
-//     console.log(11)
-//    var url = 'http://www.imooc.com/learn/348'
-//    var options = {
-//         url: url,
-//         method: 'GET',
-//         json: true,
-//         qs: data
-//     };
-//     request(options, function (error, response, body) {
-//         if(error) return next(error);
-//         response.on('data', function(data) {  
-//         html += data  
-//         })  
-    
-//         response.on('end', function() {  
-//             var courseData = filterChapters(html)  
-//             printCourseData(courseData)  
-//         }) 
+router.get('/load', function(req, res, next) {
+    console.log(11)
+   var url = 'http://www.imooc.com/learn/348'
+   var options = {
+        url: url,
+        method: 'GET',
+        json: true
+    };
+    request(options, function (error, response, body) {
+        if(error) return next(error);
+        // var courseData = filterChapters(body);  
+        // printCourseData(courseData);
+        // res.end();
+        console.log('server encoded the data as: ' + (response.headers['content-encoding'] || 'identity'))
+    //   console.log('the decoded data is: ' + body)
         
-//     });
-// });
-http.get(url, function(res) {  
-    var html = ''  
-  
-    res.on('data', function(data) {  
-        html += data  
-    })  
-  
-    res.on('end', function() {  
-        var courseData = filterChapters(html)  
-        printCourseData(courseData)  
-    })  
-}).on('error', function() {  
-    console.log('获取课程数据出错！')  
+    }).on('data',function(data){
+        console.log('decoded chunk：'+data)
+    })
+    .on('response',function(response){
+       
+    })
 });
+// http.get(url, function(res) {  
+//     var html = ''  
+  
+//     res.on('data', function(data) {  
+//         html += data  
+//     })  
+  
+//     res.on('end', function() {  
+//         var courseData = filterChapters(html)  
+//         printCourseData(courseData)  
+//     })  
+// }).on('error', function() {  
+//     console.log('获取课程数据出错！')  
+// });
 function filterChapters(html) {  
     var $ = cheerio.load(html)  
   
