@@ -4,7 +4,8 @@
   var request = require('request');
   var express = require('express');
   var fs =require('fs');
-var router = express.Router();
+  var router = express.Router();
+  var MongoDB = require('../Model/db2.js');
   var url = 'http://www.cnblogs.com/cate/html5/#p'; //要抓取的网址。博客园的页数是通过添加锚点的，后面有拼接
   
    
@@ -12,7 +13,6 @@ var router = express.Router();
    //未完成（unfulfilled）、已完成（resolved）和拒绝（rejected）
   //事件已完成则使用成功的callback（resolve）返回自身，失败了则
   //选择使用callback(reject)来返回失败的自身。
- 
  function getPageList(url){
      //return Promise对象
      return new Promise(function(resolve,reject) {
@@ -76,29 +76,32 @@ var router = express.Router();
                  reject(e.message);
              }); 
  
-        })
-    })
+        });
+    });
  }
   
  //请求博客园前10页的数据。将所有的请求预先放置在集合内。
  var list = [];
- for(var i=1;i<=100;i++) {
+ for(var i=1;i<=10;i++) {
      var url = url+i;
      list.push(getPageList(url));
  
  }
   function setFile(file,index){
          return new Promise(function(resolve, reject) {
-             console.log('正在存储');
-             fs.writeFile('../datas/datas'+index+'.json', file, 'utf-8', function (err) {
-                if (err) {
-                    reject(err);
-                    console.log('存储数据失败');
-                }else{
-                    resolve(file);
-                }
+              console.log('正在存储');
+             MongoDB.save('article',file, function (err, res) {
+                console.log('存储成功');
             });
-         })
+            //  fs.writeFile('../datas/datas'+index+'.json', file, 'utf-8', function (err) { //生成文件存储
+            //     if (err) {
+            //         reject(err);
+            //         console.log('存储数据失败');
+            //     }else{
+            //         resolve(file);
+            //     }
+            // });
+         });
     }
     function writeFileAsync(filelist){
          Promise  
@@ -118,8 +121,9 @@ var router = express.Router();
     .all(list)
      .then(function(data) {
          data.forEach(function(data,index){
-             var datas=JSON.stringify(data);
-             files.push(setFile(datas,index));
+          for(var i=0;i<data.length;i++){
+            files.push(setFile(data[i]));
+           }
          });
          writeFileAsync(files);
       }).catch(function(err){
