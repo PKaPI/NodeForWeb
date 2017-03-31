@@ -13,34 +13,34 @@ var DB_URL = "mongodb://127.0.0.1:27017/NodeJS";
 mongoose.connect(DB_URL);
 
 /**
-  * 连接成功
-  */
-mongoose.connection.on('connected', function () {    
-    console.log('Mongoose connection open to ' + DB_URL);  
-});    
+ * 连接成功
+ */
+mongoose.connection.on('connected', function() {
+    console.log('Mongoose connection open to ' + DB_URL);
+});
 
 /**
  * 连接异常
  */
-mongoose.connection.on('error',function (err) {    
-    console.log('Mongoose connection error: ' + err);  
-});    
- 
+mongoose.connection.on('error', function(err) {
+    console.log('Mongoose connection error: ' + err);
+});
+
 /**
  * 连接断开
  */
-mongoose.connection.on('disconnected', function () {    
-    console.log('Mongoose connection disconnected');  
-});    
+mongoose.connection.on('disconnected', function() {
+    console.log('Mongoose connection disconnected');
+});
 
-process.on('SIGINT', function () {
-    mongoose.connection.close(function () {
+process.on('SIGINT', function() {
+    mongoose.connection.close(function() {
         logger.info('Mongoose disconnected through app termination');
         process.exit(0);
     });
 });
 
-var DB = function () {
+var DB = function() {
     this.mongoClient = {};
     var filename = require('../config/table.json');
     this.tabConf = filename;
@@ -49,7 +49,7 @@ var DB = function () {
  * 初始化mongoose model
  * @param table_name 表名称(集合名称)
  */
-DB.prototype.getConnection = function (table_name) {
+DB.prototype.getConnection = function(table_name) {
     if (!table_name) return;
     if (!this.tabConf[table_name]) {
         logger.error('No table structure');
@@ -59,9 +59,9 @@ DB.prototype.getConnection = function (table_name) {
     var client = this.mongoClient[table_name];
     if (!client) {
         //构建用户信息表结构
-        for(var i in this.tabConf[table_name]){
-            if(typeof this.tabConf[table_name][i]=="object"&&this.tabConf[table_name][i].type==="Date"){
-                this.tabConf[table_name][i].default=Date.now;
+        for (var i in this.tabConf[table_name]) {
+            if (typeof this.tabConf[table_name][i] == "object" && this.tabConf[table_name][i].type === "Date") {
+                this.tabConf[table_name][i].default = Date.now;
             }
         }
         var nodeSchema = new mongoose.Schema(this.tabConf[table_name]);
@@ -80,26 +80,26 @@ DB.prototype.getConnection = function (table_name) {
  * @param fields 表数据
  * @param callback 回调方法
  */
-DB.prototype.save = function (table_name, fields, callback) {
+DB.prototype.save = function(table_name, fields, callback) {
     if (!fields) {
-        if (callback) callback({msg: 'Field is not allowed for null'});
+        if (callback) callback({ msg: 'Field is not allowed for null' });
         return false;
     }
 
     var err_num = 0;
     for (var i in fields) {
-        if (!this.tabConf[table_name][i]){
-            err_num ++;
-        } 
+        if (!this.tabConf[table_name][i]) {
+            err_num++;
+        }
     }
     if (err_num > 0) {
-        if (callback) callback({msg: 'Wrong field name'});
+        if (callback) callback({ msg: 'Wrong field name' });
         return false;
     }
 
     var node_model = this.getConnection(table_name);
     var mongooseEntity = new node_model(fields);
-    mongooseEntity.save(function (err, res) {
+    mongooseEntity.save(function(err, res) {
         if (err) {
             if (callback) callback(err);
         } else {
@@ -115,13 +115,13 @@ DB.prototype.save = function (table_name, fields, callback) {
  * @param update_fields 要更新的字段 {age: 21, sex: 1}
  * @param callback 回调方法
  */
-DB.prototype.update = function (table_name, conditions, update_fields, callback) {
+DB.prototype.update = function(table_name, conditions, update_fields, callback) {
     if (!update_fields || !conditions) {
-        if (callback) callback({msg: 'Parameter error'});
+        if (callback) callback({ msg: 'Parameter error' });
         return;
     }
     var node_model = this.getConnection(table_name);
-    node_model.update(conditions, {$set: update_fields}, {multi: true, upsert: true}, function (err, res) {
+    node_model.update(conditions, { $set: update_fields }, { multi: true, upsert: true }, function(err, res) {
         if (err) {
             if (callback) callback(err);
         } else {
@@ -137,13 +137,13 @@ DB.prototype.update = function (table_name, conditions, update_fields, callback)
  * @param update_fields 更新的操作符 {$set: {id: 123}}
  * @param callback 回调方法
  */
-DB.prototype.updateData = function (table_name, conditions, update_fields, callback) {
+DB.prototype.updateData = function(table_name, conditions, update_fields, callback) {
     if (!update_fields || !conditions) {
-        if (callback) callback({msg: 'Parameter error'});
+        if (callback) callback({ msg: 'Parameter error' });
         return;
     }
     var node_model = this.getConnection(table_name);
-    node_model.findOneAndUpdate(conditions, update_fields, {multi: true, upsert: true}, function (err, data) {
+    node_model.findOneAndUpdate(conditions, update_fields, { multi: true, upsert: true }, function(err, data) {
         if (callback) callback(err, data);
     });
 };
@@ -154,9 +154,9 @@ DB.prototype.updateData = function (table_name, conditions, update_fields, callb
  * @param conditions 删除需要的条件 {_id: id}
  * @param callback 回调方法
  */
-DB.prototype.remove = function (table_name, conditions, callback) {
+DB.prototype.remove = function(table_name, conditions, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.remove(conditions, function (err, res) {
+    node_model.remove(conditions, function(err, res) {
         if (err) {
             if (callback) callback(err);
         } else {
@@ -172,9 +172,9 @@ DB.prototype.remove = function (table_name, conditions, callback) {
  * @param fields 待返回字段
  * @param callback 回调方法
  */
-DB.prototype.find = function (table_name, conditions, fields, callback) {
+DB.prototype.find = function(table_name, conditions, fields, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.find(conditions, fields || null, {}, function (err, res) {
+    node_model.find(conditions, fields || null, {}, function(err, res) {
         if (err) {
             callback(err);
         } else {
@@ -189,9 +189,9 @@ DB.prototype.find = function (table_name, conditions, fields, callback) {
  * @param conditions 查询条件
  * @param callback 回调方法
  */
-DB.prototype.findOne = function (table_name, conditions, callback) {
+DB.prototype.findOne = function(table_name, conditions, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.findOne(conditions, function (err, res) {
+    node_model.findOne(conditions, function(err, res) {
         if (err) {
             callback(err);
         } else {
@@ -206,9 +206,9 @@ DB.prototype.findOne = function (table_name, conditions, callback) {
  * @param _id 可以是字符串或 ObjectId 对象。
  * @param callback 回调方法
  */
-DB.prototype.findById = function (table_name, _id, callback) {
+DB.prototype.findById = function(table_name, _id, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.findById(_id, function (err, res){
+    node_model.findById(_id, function(err, res) {
         if (err) {
             callback(err);
         } else {
@@ -223,9 +223,9 @@ DB.prototype.findById = function (table_name, _id, callback) {
  * @param conditions 查询条件
  * @param callback 回调方法
  */
-DB.prototype.count = function (table_name, conditions, callback) {
+DB.prototype.count = function(table_name, conditions, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.count(conditions, function (err, res) {
+    node_model.count(conditions, function(err, res) {
         if (err) {
             callback(err);
         } else {
@@ -241,9 +241,9 @@ DB.prototype.count = function (table_name, conditions, callback) {
  * @param conditions 查询条件
  * @param callback 回调方法
  */
-DB.prototype.distinct = function (table_name, field, conditions, callback) {
+DB.prototype.distinct = function(table_name, field, conditions, callback) {
     var node_model = this.getConnection(table_name);
-    node_model.distinct(field, conditions, function (err, res) {
+    node_model.distinct(field, conditions, function(err, res) {
         if (err) {
             callback(err);
         } else {
@@ -259,13 +259,13 @@ DB.prototype.distinct = function (table_name, field, conditions, callback) {
  * @param options 选项：{fields: "a b c", sort: {time: -1}, limit: 10}
  * @param callback 回调方法
  */
-DB.prototype.where = function (table_name, conditions, options, callback) {
+DB.prototype.where = function(table_name, conditions, options, callback) {
     var node_model = this.getConnection(table_name);
     node_model.find(conditions)
         .select(options.fields || '')
         .sort(options.sort || {})
         .limit(options.limit || {})
-        .exec(function (err, res) {
+        .exec(function(err, res) {
             if (err) {
                 callback(err);
             } else {

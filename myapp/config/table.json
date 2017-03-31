@@ -1,25 +1,25 @@
 {
-"user": {
-        "username":{ "type":"String","default":"匿名用户","unique":true},  
-        "email":{"type":"String", "unique":true},
-        "password":{"type":"String"},
-        "createtime":{"type":"Date","default":"Date.now"},
-        "lastLogin" :{"type":"Date","default":"Date.now"}
+    "user": {
+        "username": { "type": "String", "default": "匿名用户", "unique": true },
+        "email": { "type": "String", "unique": true },
+        "password": { "type": "String" },
+        "createtime": { "type": "Date", "default": "Date.now" },
+        "lastLogin": { "type": "Date", "default": "Date.now" }
     },
-"article": {
-         "title":"String",
-         "href":"String",
-         "author":"String",
-         "authorhref":"String",
-         "content":"String",
-         "releaseTime":"String",
-         "remark":"String",
-         "Reading":"String",
-         "ReadingHraf":"String",
-         "type":{"type":"String","default":"HTML5"},
-         "createtime":{"type":"Date","default":"Date.now"}
+    "article": {
+        "title": "String",
+        "href": "String",
+        "author": "String",
+        "authorhref": "String",
+        "content": "String",
+        "releaseTime": "String",
+        "remark": "String",
+        "Reading": "String",
+        "ReadingHraf": "String",
+        "type": { "type": "String", "default": "HTML5" },
+        "createtime": { "type": "Date", "default": "Date.now" }
     },
-"messageBoard": {
+    "messageBoard": {
         "name": "String",
         "content": "content",
         "createtime": "String"
